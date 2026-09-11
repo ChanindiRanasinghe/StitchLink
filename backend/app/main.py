@@ -1,9 +1,12 @@
 from fastapi import FastAPI
 
+from backend.app.core.config import settings
+
+
 app = FastAPI(
-    title="StitchLink API",
+    title=settings.app_name,
     description="Backend API for the StitchLink marketplace",
-    version="1.0.0"
+    version=settings.app_version,
 )
 
 
@@ -11,5 +14,13 @@ app = FastAPI(
 def root():
     return {
         "message": "Welcome to StitchLink API",
-        "status": "running"
+        "status": "running",
+    }
+
+
+@app.get("/health")
+def health_check():
+    return {
+        "status": "healthy",
+        "service": settings.app_name,
     }
