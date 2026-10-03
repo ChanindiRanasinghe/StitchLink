@@ -1,6 +1,62 @@
 "use client";
 
+import { useState } from "react";
+import {
+  getSuggestedPricing,
+  validateCategory,
+  PricingAssistantResponse,
+  CategoryValidationResponse,
+} from "@/lib/api";
+
 export default function AIFeaturesSection() {
+  // Live AI Pricing Assistant state
+  const [pricingCategory, setPricingCategory] = useState("Frock");
+  const [quantity, setQuantity] = useState<number>(50);
+  const [deadlineDays, setDeadlineDays] = useState<number>(7);
+  const [pricingLoading, setPricingLoading] = useState(false);
+  const [pricingResult, setPricingResult] = useState<PricingAssistantResponse | null>(null);
+  const [pricingError, setPricingError] = useState<string | null>(null);
+
+  // Live AI Category Validation state
+  const [orderTitle, setOrderTitle] = useState("Cotton Office Trouser Batch");
+  const [selectedCat, setSelectedCat] = useState("Frock");
+  const [validationLoading, setValidationLoading] = useState(false);
+  const [validationResult, setValidationResult] = useState<CategoryValidationResponse | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  const handleCalculatePricing = async () => {
+    setPricingLoading(true);
+    setPricingError(null);
+    try {
+      const res = await getSuggestedPricing({
+        category: pricingCategory,
+        quantity: Number(quantity),
+        deadline_days: Number(deadlineDays),
+      });
+      setPricingResult(res);
+    } catch (err: any) {
+      setPricingError("Unable to connect to backend API. Please ensure FastAPI is running on port 8000.");
+    } finally {
+      setPricingLoading(false);
+    }
+  };
+
+  const handleValidateCategory = async () => {
+    setValidationLoading(true);
+    setValidationError(null);
+    try {
+      const res = await validateCategory({
+        title: orderTitle,
+        selected_category: selectedCat,
+      });
+      setValidationResult(res);
+    } catch (err: any) {
+      setValidationError("Unable to connect to backend API. Please ensure FastAPI is running on port 8000.");
+    } finally {
+      setValidationLoading(false);
+    }
+  };
+
   const aiFeatures = [
     {
       title: "Smart Dressmaker Matching",
@@ -115,6 +171,165 @@ export default function AIFeaturesSection() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* --- LIVE AI TESTBENCH WIDGET --- */}
+        <div className="mt-16 bg-white rounded-3xl p-6 sm:p-8 border border-purple-100 shadow-lg relative overflow-hidden">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 border-b border-gray-100 pb-5">
+            <div>
+              <span className="text-xs font-bold text-[#6C4AB6] bg-[#EDE7F6] px-3 py-1 rounded-full uppercase tracking-wider">
+                Live AI API Testbench
+              </span>
+              <h3 className="text-xl font-bold text-[#1F2937] mt-2">
+                Try the StitchLink AI Engine Live
+              </h3>
+            </div>
+            <p className="text-xs text-[#6B7280] max-w-sm">
+              Test real API requests sent directly to the FastAPI backend running at <code className="text-[#6C4AB6] bg-purple-50 px-1 py-0.5 rounded">http://localhost:8000</code>.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            {/* 1. Live AI Pricing Assistant */}
+            <div className="bg-[#FAF9FC] p-5 rounded-2xl border border-purple-50 space-y-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-[#6C4AB6] text-white flex items-center justify-center font-bold text-sm">
+                  LKR
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-[#1F2937]">AI Price Range Estimator</h4>
+                  <p className="text-xs text-[#6B7280]">Calculates market pricing based on batch volume & deadline</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3 pt-2">
+                <div>
+                  <label className="text-[11px] font-semibold text-[#6B7280] block mb-1">Category</label>
+                  <select
+                    value={pricingCategory}
+                    onChange={(e) => setPricingCategory(e.target.value)}
+                    className="w-full text-xs bg-white border border-gray-200 rounded-lg p-2 font-medium focus:ring-2 focus:ring-[#6C4AB6]"
+                  >
+                    <option value="Frock">Frock</option>
+                    <option value="Saree">Saree</option>
+                    <option value="Uniform">Uniform</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold text-[#6B7280] block mb-1">Quantity</label>
+                  <input
+                    type="number"
+                    value={quantity}
+                    onChange={(e) => setQuantity(Number(e.target.value))}
+                    className="w-full text-xs bg-white border border-gray-200 rounded-lg p-2 font-medium focus:ring-2 focus:ring-[#6C4AB6]"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold text-[#6B7280] block mb-1">Deadline (Days)</label>
+                  <input
+                    type="number"
+                    value={deadlineDays}
+                    onChange={(e) => setDeadlineDays(Number(e.target.value))}
+                    className="w-full text-xs bg-white border border-gray-200 rounded-lg p-2 font-medium focus:ring-2 focus:ring-[#6C4AB6]"
+                  />
+                </div>
+              </div>
+
+              <button
+                onClick={handleCalculatePricing}
+                disabled={pricingLoading}
+                className="w-full py-2.5 bg-[#6C4AB6] hover:bg-[#5b3da0] text-white text-xs font-bold rounded-xl shadow-sm transition-all flex items-center justify-center gap-2"
+              >
+                {pricingLoading ? "Calculating..." : "Calculate Price with AI"}
+              </button>
+
+              {pricingError && (
+                <div className="p-3 bg-red-50 text-red-600 rounded-xl text-xs font-medium border border-red-100">
+                  {pricingError}
+                </div>
+              )}
+
+              {pricingResult && (
+                <div className="p-4 bg-white rounded-xl border border-purple-100 space-y-1 shadow-xs">
+                  <div className="text-[11px] font-bold text-[#6B7280] uppercase">Suggested Price per Unit</div>
+                  <div className="text-lg font-extrabold text-[#2A9D8F]">
+                    LKR {pricingResult.suggested_price_min_lkr.toLocaleString()} - {pricingResult.suggested_price_max_lkr.toLocaleString()}
+                  </div>
+                  <p className="text-xs text-[#6B7280]">{pricingResult.explanation}</p>
+                </div>
+              )}
+            </div>
+
+            {/* 2. Live Category Validation */}
+            <div className="bg-[#FAF9FC] p-5 rounded-2xl border border-purple-50 space-y-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-[#2A9D8F] text-white flex items-center justify-center font-bold text-sm">
+                  ✓
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-[#1F2937]">AI Category Validation Engine</h4>
+                  <p className="text-xs text-[#6B7280]">Detects garment title vs category mismatch</p>
+                </div>
+              </div>
+
+              <div className="space-y-3 pt-2">
+                <div>
+                  <label className="text-[11px] font-semibold text-[#6B7280] block mb-1">Order Title</label>
+                  <input
+                    type="text"
+                    value={orderTitle}
+                    onChange={(e) => setOrderTitle(e.target.value)}
+                    className="w-full text-xs bg-white border border-gray-200 rounded-lg p-2 font-medium focus:ring-2 focus:ring-[#2A9D8F]"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold text-[#6B7280] block mb-1">Selected Category</label>
+                  <select
+                    value={selectedCat}
+                    onChange={(e) => setSelectedCat(e.target.value)}
+                    className="w-full text-xs bg-white border border-gray-200 rounded-lg p-2 font-medium focus:ring-2 focus:ring-[#2A9D8F]"
+                  >
+                    <option value="Frock">Frock</option>
+                    <option value="Trouser">Trouser</option>
+                    <option value="Shirt">Shirt</option>
+                    <option value="Saree">Saree</option>
+                  </select>
+                </div>
+              </div>
+
+              <button
+                onClick={handleValidateCategory}
+                disabled={validationLoading}
+                className="w-full py-2.5 bg-[#2A9D8F] hover:bg-[#238377] text-white text-xs font-bold rounded-xl shadow-sm transition-all flex items-center justify-center gap-2"
+              >
+                {validationLoading ? "Validating..." : "Validate Category with AI"}
+              </button>
+
+              {validationError && (
+                <div className="p-3 bg-red-50 text-red-600 rounded-xl text-xs font-medium border border-red-100">
+                  {validationError}
+                </div>
+              )}
+
+              {validationResult && (
+                <div
+                  className={`p-4 rounded-xl border text-xs space-y-1 shadow-xs ${
+                    validationResult.mismatch_detected
+                      ? "bg-amber-50 border-amber-200 text-amber-900"
+                      : "bg-emerald-50 border-emerald-200 text-emerald-900"
+                  }`}
+                >
+                  <div className="font-bold flex items-center justify-between">
+                    <span>{validationResult.mismatch_detected ? "⚠️ Mismatch Detected" : "✅ Validation Passed"}</span>
+                    <span className="text-[10px] opacity-75">Confidence: {Math.round(validationResult.confidence_score * 100)}%</span>
+                  </div>
+                  <p>{validationResult.warning_message}</p>
+                </div>
+              )}
+            </div>
+
+          </div>
         </div>
 
         {/* AI Disclaimer Callout */}
