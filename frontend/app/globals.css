@@ -1,26 +1,57 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --primary: #6C4AB6;
+    --primary-hover: #5A3DA0;
+    --secondary: #EDE7F6;
+    --accent: #2A9D8F;
+    --accent-hover: #228479;
+    --dark: #1F2937;
+    --secondary-text: #6B7280;
+    --bg-main: #F9FAFB;
+    --card-bg: #FFFFFF;
+    --success: #10B981;
+    --warning: #F59E0B;
+    --error: #EF4444;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@theme {
+  --color-stitch-purple: #6C4AB6;
+  --color-stitch-purple-hover: #5A3DA0;
+  --color-stitch-light-purple: #EDE7F6;
+  --color-stitch-teal: #2A9D8F;
+  --color-stitch-teal-hover: #228479;
+  --color-stitch-dark: #1F2937;
+  --color-stitch-muted: #6B7280;
+  --color-stitch-bg: #F9FAFB;
+  --color-stitch-success: #10B981;
+  --color-stitch-warning: #F59E0B;
+  --color-stitch-danger: #EF4444;
+  --font-inter: var(--font-inter), sans-serif;
 }
+
+body {
+  background-color: var(--bg-main);
+  color: var(--dark);
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+}
+
+/* Custom UI Utilities */
+.ai-badge {
+  background: linear-gradient(135deg, rgba(108, 74, 182, 0.12) 0%, rgba(42, 157, 143, 0.12) 100%);
+  border: 1px solid rgba(108, 74, 182, 0.25);
+  color: #6C4AB6;
+}
+
+.ai-card-glow {
+  box-shadow: 0 4px 20px -2px rgba(108, 74, 182, 0.15), 0 2px 6px -1px rgba(42, 157, 143, 0.1);
+  border: 1px solid rgba(108, 74, 182, 0.2);
+}
+
+.glass-header {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px);
+}
+
