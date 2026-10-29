@@ -13,6 +13,9 @@ export const metadata: Metadata = {
     "Connecting clothing shops with skilled solo dressmakers across Sri Lanka.",
 };
 
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+
 export default function RootLayout({
   children,
 }: {
@@ -20,8 +23,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-sans bg-neutral-50 text-neutral-900`}>
-        {children}
+      <body className={`${inter.variable} font-sans bg-neutral-50 text-neutral-900 min-h-screen flex flex-col`}>
+        <Navbar />
+        <main className="flex-1">{children}</main>
+        <Footer />
       </body>
     </html>
   );
