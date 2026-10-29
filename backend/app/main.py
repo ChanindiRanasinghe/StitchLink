@@ -1,11 +1,16 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
+from app.db.init_db import init_db
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
     openapi_url=f'{settings.API_V1_STR}/openapi.json'
 )
+
+@app.on_event("startup")
+async def startup_event():
+    init_db()
 
 app.add_middleware(
     CORSMiddleware,
