@@ -1,3 +1,4 @@
+# backend/app/api/v1/endpoints/users.py
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
@@ -46,24 +47,16 @@ def create_review(
     if existing_review:
         raise HTTPException(status_code=400, detail="A review has already been submitted for this order")
 
+    # Determine dressmaker target ID dynamically if not passed directly
+    reviewee_id = review_in.reviewee_id or getattr(order, "dressmaker_id", None)
+    if not reviewee_id:
+        raise HTTPException(status_code=400, detail="No assigned dressmaker found for this order to review")
+
+    # Map overall rating to quality and timeliness if specific sub-ratings aren't provided
+    quality_score = review_in.stitching_quality_rating or review_in.rating
+    timeliness_score = review_in.timeliness_rating or review_in.rating
+
     review = Review(
         order_id=review_in.order_id,
         reviewer_id=current_user.id,
-        reviewee_id=review_in.reviewee_id,
-        rating=review_in.rating,
-        stitching_quality_rating=review_in.stitching_quality_rating,
-        timeliness_rating=review_in.timeliness_rating,
-        comment=review_in.comment,
-    )
-    db.add(review)
-    db.commit()
-    db.refresh(review)
-    return review
-
-@router.get("/reviews/user/{user_id}", response_model=List[ReviewRead])
-def get_user_reviews(
-    user_id: int,
-    db: Session = Depends(get_db),
-):
-    reviews = db.query(Review).filter(Review.reviewee_id == user_id).order_by(Review.created_at.desc()).all()
-    return reviews
+        reviewee_id=review
