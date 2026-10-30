@@ -1,4 +1,10 @@
+// frontend/lib/api.ts
+
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1";
+
+// ---------------------------------------------------------------------------
+// Auth Helpers & Base Fetcher
+// ---------------------------------------------------------------------------
 
 export function getAuthToken(): string | null {
   if (typeof window === "undefined") return null;
@@ -59,4 +65,101 @@ export async function fetchApi<T>(endpoint: string, options: RequestInit = {}): 
   }
 
   return res.json();
+}
+
+// ---------------------------------------------------------------------------
+// Order Models & Operations
+// ---------------------------------------------------------------------------
+
+export interface Order {
+  id: number;
+  shop_id: number;
+  dressmaker_id?: number;
+  title: string;
+  description?: string;
+  category: string;
+  quantity: number;
+  target_budget_lkr: number;
+  deadline?: string;
+  fabric_provided?: string;
+  location_district?: string;
+  image_url?: string;
+  status: 'DRAFT' | 'OPEN' | 'ASSIGNED' | 'IN_PRODUCTION' | 'COMPLETED' | 'DELIVERED' | 'CANCELLED';
+  bids_count?: number;
+  created_at: string;
+}
+
+export async function getOrderDetails(orderId: string | number): Promise<Order> {
+  return fetchApi<Order>(`/orders/${orderId}`);
+}
+
+export async function updateOrderStatus(orderId: number, newStatus: string): Promise<Order> {
+  return fetchApi<Order>(`/orders/${orderId}/status`, {
+    method: 'PATCH',
+    body: JSON.stringify({ new_status: newStatus }),
+  });
+}
+
+export async function uploadOrderImage(orderId: number, file: File): Promise<{ image_url: string }> {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  return fetchApi<{ image_url: string }>(`/orders/${orderId}/upload-image`, {
+    method: 'POST',
+    body: formData,
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Messaging Models & Operations
+// ---------------------------------------------------------------------------
+
+export interface Message {
+  id: number;
+  order_id: number;
+  sender_id: number;
+  sender_name: string;
+  content: string;
+  created_at: string;
+}
+
+export async function getOrderMessages(orderId: string | number): Promise<Message[]> {
+  return fetchApi<Message[]>(`/messages/order/${orderId}`);
+}
+
+export async function sendMessage(orderId: string | number, content: string): Promise<Message> {
+  return fetchApi<Message>(`/messages/order/${orderId}`, {
+    method: 'POST',
+    body: JSON.stringify({ content }),
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Review Models & Operations
+// ---------------------------------------------------------------------------
+
+export interface Review {
+  id: number;
+  order_id: number;
+  reviewer_id: number;
+  reviewee_id: number;
+  rating: number;
+  stitching_quality_rating?: number;
+  timeliness_rating?: number;
+  comment?: string;
+  created_at: string;
+}
+
+export async function submitReview(data: {
+  order_id: number;
+  reviewee_id?: number;
+  rating: number;
+  stitching_quality_rating?: number;
+  timeliness_rating?: number;
+  comment?: string;
+}): Promise<Review> {
+  return fetchApi<Review>('/users/reviews', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
 }
