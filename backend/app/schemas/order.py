@@ -13,18 +13,21 @@ class OrderBase(BaseModel):
     fabric_provided: Optional[str] = "SHOP_PROVIDES"
     location_district: Optional[str] = "Colombo"
 
-class OrderCreate(OrderBase):
-    pass
+class OrderCreate(BaseModel):
+    title: str = Field(..., min_length=3, max_length=255)
+    description: Optional[str] = Field(None, max_length=2000)
+    category: GarmentCategory
+    quantity: int = Field(..., ge=1, le=10000)
+    target_budget_lkr: float = Field(..., ge=100.0)
+    deadline: Optional[datetime] = None
+    fabric_provided: Optional[str] = "SHOP_PROVIDES"
+    location_district: Optional[str] = "Colombo"
 
 class OrderUpdate(BaseModel):
-    title: Optional[str] = None
-    description: Optional[str] = None
-    category: Optional[GarmentCategory] = None
-    quantity: Optional[int] = None
-    target_budget_lkr: Optional[float] = None
-    deadline: Optional[datetime] = None
-    fabric_provided: Optional[str] = None
-    location_district: Optional[str] = None
+title: Optional[str] = Field(None, min_length=3, max_length=255)
+    description: Optional[str] = Field(None, max_length=2000)
+    quantity: Optional[int] = Field(None, ge=1, le=10000)
+    target_budget_lkr: Optional[float] = Field(None, ge=100.0)
     status: Optional[OrderStatus] = None
 
 class OrderShopBrief(BaseModel):
