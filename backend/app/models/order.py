@@ -1,3 +1,4 @@
+# backend/app/models/order.py
 import enum
 from sqlalchemy import Column, Integer, String, Float, Text, Enum, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
@@ -7,9 +8,10 @@ from app.db.session import Base
 class OrderStatus(str, enum.Enum):
     DRAFT = "DRAFT"
     OPEN = "OPEN"                 # Accepting bids from dressmakers
-    ASSIGNED = "ASSIGNED"         # Bid awarded, sample/production starting
+    ASSIGNED = "ASSIGNED"         # Bid awarded
     IN_PRODUCTION = "IN_PRODUCTION" # Sewing under way
-    COMPLETED = "COMPLETED"       # Batch delivered and verified
+    COMPLETED = "COMPLETED"       # Batch finished
+    DELIVERED = "DELIVERED"       # Received by shop
     CANCELLED = "CANCELLED"
 
 class GarmentCategory(str, enum.Enum):
@@ -28,6 +30,8 @@ class Order(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     shop_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    dressmaker_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True) # Added assigned dressmaker tracking
+    
     title = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
     category = Column(Enum(GarmentCategory), default=GarmentCategory.SHIRTS, nullable=False)
@@ -36,9 +40,12 @@ class Order(Base):
     deadline = Column(DateTime, nullable=True)
     fabric_provided = Column(String(100), default="SHOP_PROVIDES") # SHOP_PROVIDES / DRESSMAKER_SOURCES
     location_district = Column(String(100), default="Colombo")
+    image_url = Column(String(500), nullable=True) # Added reference image path
+
     status = Column(Enum(OrderStatus), default=OrderStatus.OPEN, nullable=False, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-    shop = relationship("User", backref="orders_created")
+    shop = relationship("User", foreign_keys=[shop_id], backref="orders_created")
+    dressmaker = relationship("User", foreign_keys=[dressmaker_id], backref="orders_assigned") # Added relationship
     bids = relationship("Bid", back_populates="order", cascade="all, delete-orphan")
