@@ -1,81 +1,60 @@
 import Link from "next/link";
 
+const currentYear = 2026;
+
 export default function Footer() {
   return (
-    <footer className="bg-neutral-900 text-neutral-400 py-12 border-t border-neutral-800 mt-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
+    <footer className="mt-auto border-t border-slate-200 bg-slate-950 text-slate-300">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="grid gap-10 md:grid-cols-4">
           <div>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-teal-500 flex items-center justify-center text-white font-bold text-sm">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-teal-500 to-emerald-500 text-sm font-black text-white">
                 SL
               </div>
-              <span className="font-bold text-lg text-white">StitchLink</span>
+              <span className="text-lg font-black text-white">StitchLink</span>
             </div>
-            <p className="text-sm text-neutral-400 leading-relaxed mb-4">
-              Empowering Sri Lankan boutique fashion houses and skilled solo dressmakers through direct batch manufacturing partnerships.
+            <p className="max-w-xs text-sm leading-7 text-slate-400">
+              Connecting boutique stores with skilled local dressmakers for transparent, flexible stitch production across Sri Lanka.
             </p>
-            <div className="text-xs text-neutral-500">
-              Colombo • Kandy • Galle • Kurunegala • Gampaha
-            </div>
           </div>
 
           <div>
-            <h4 className="text-white text-sm font-semibold mb-3">For Fashion Brands</h4>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="/shop/new-order" className="hover:text-teal-400 transition-colors">
-                  Post Garment Batch
-                </Link>
-              </li>
-              <li>
-                <Link href="/shop" className="hover:text-teal-400 transition-colors">
-                  Shop Dashboard
-                </Link>
-              </li>
-              <li>
-                <span className="text-neutral-500 text-xs">Quality Inspections & Escrow</span>
-              </li>
+            <h4 className="mb-4 text-sm font-semibold uppercase tracking-[0.16em] text-slate-100">For brands</h4>
+            <ul className="space-y-3 text-sm text-slate-400">
+              <li><Link href="/shop/new-order" className="transition hover:text-teal-300">Post a batch order</Link></li>
+              <li><Link href="/shop" className="transition hover:text-teal-300">Shop dashboard</Link></li>
+              <li><span>Quality checks & reviews</span></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-white text-sm font-semibold mb-3">For Dressmakers</h4>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="/dressmaker/browse" className="hover:text-teal-400 transition-colors">
-                  Browse Active Contracts
-                </Link>
-              </li>
-              <li>
-                <Link href="/dressmaker" className="hover:text-teal-400 transition-colors">
-                  Tailor Workspace
-                </Link>
-              </li>
-              <li>
-                <span className="text-neutral-500 text-xs">Guaranteed Timely Payouts</span>
-              </li>
+            <h4 className="mb-4 text-sm font-semibold uppercase tracking-[0.16em] text-slate-100">For makers</h4>
+            <ul className="space-y-3 text-sm text-slate-400">
+              <li><Link href="/dressmaker/browse" className="transition hover:text-teal-300">Browse open jobs</Link></li>
+              <li><Link href="/dressmaker" className="transition hover:text-teal-300">Tailor workspace</Link></li>
+              <li><span>Guaranteed production visibility</span></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-white text-sm font-semibold mb-3">Garment Categories</h4>
-            <div className="flex flex-wrap gap-1.5 text-xs">
-              <span className="bg-neutral-800 px-2.5 py-1 rounded-md text-neutral-300">Linen Frocks</span>
-              <span className="bg-neutral-800 px-2.5 py-1 rounded-md text-neutral-300">Men's Shirts</span>
-              <span className="bg-neutral-800 px-2.5 py-1 rounded-md text-neutral-300">Batik Wear</span>
-              <span className="bg-neutral-800 px-2.5 py-1 rounded-md text-neutral-300">School Uniforms</span>
-              <span className="bg-neutral-800 px-2.5 py-1 rounded-md text-neutral-300">Embroidery</span>
+            <h4 className="mb-4 text-sm font-semibold uppercase tracking-[0.16em] text-slate-100">Categories</h4>
+            <div className="flex flex-wrap gap-2 text-xs">
+              <span className="rounded-full bg-slate-800 px-2.5 py-1.5 text-slate-300">Linen frocks</span>
+              <span className="rounded-full bg-slate-800 px-2.5 py-1.5 text-slate-300">Shirts</span>
+              <span className="rounded-full bg-slate-800 px-2.5 py-1.5 text-slate-300">Batik</span>
+              <span className="rounded-full bg-slate-800 px-2.5 py-1.5 text-slate-300">Schoolwear</span>
+              <span className="rounded-full bg-slate-800 px-2.5 py-1.5 text-slate-300">Uniforms</span>
             </div>
           </div>
         </div>
 
-        <div className="pt-6 border-t border-neutral-800 flex flex-col sm:flex-row items-center justify-between text-xs text-neutral-500 gap-4">
-          <p>© {new Date().getFullYear()} StitchLink Sri Lanka. All rights reserved.</p>
-          <div className="flex gap-4">
-            <span className="hover:text-neutral-300 cursor-pointer">Terms of Service</span>
-            <span className="hover:text-neutral-300 cursor-pointer">Privacy Policy</span>
-            <span className="hover:text-neutral-300 cursor-pointer">Contact Support (+94 11 234 5678)</span>
+        <div className="mt-10 flex flex-col gap-4 border-t border-slate-800 pt-6 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+          <p>© {currentYear} StitchLink Sri Lanka.</p>
+          <div className="flex flex-wrap gap-4">
+            <span>Terms</span>
+            <span>Privacy</span>
+            <span>Support</span>
           </div>
         </div>
       </div>
