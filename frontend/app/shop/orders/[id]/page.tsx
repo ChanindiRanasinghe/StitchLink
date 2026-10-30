@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { fetchApi } from "@/lib/api";
 import { Order, Bid, BidStatus } from "@/lib/types";
@@ -13,6 +13,14 @@ const BID_STATUS_UI: Record<BidStatus, { label: string; cls: string }> = {
 };
 
 export default function OrderDetailPage() {
+  return (
+    <Suspense fallback={<div className="max-w-4xl mx-auto px-4 py-20 text-center text-neutral-400 text-sm">Loading order details…</div>}>
+      <OrderDetailContent />
+    </Suspense>
+  );
+}
+
+function OrderDetailContent() {
   const params = useParams();
   const orderId = params?.id as string;
 
