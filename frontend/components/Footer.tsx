@@ -1,8 +1,10 @@
 "use client";
 
+import type { Language } from "@/lib/translations";
+
 interface FooterProps {
-  currentLang: string;
-  onLanguageChange: (lang: string) => void;
+  currentLang: Language;
+  onLanguageChange: (lang: Language) => void;
   onOpenAdminAuth?: () => void;
 }
 
@@ -60,7 +62,7 @@ export default function Footer({ currentLang, onLanguageChange, onOpenAdminAuth 
             <div className="space-y-2">
               <select
                 value={currentLang}
-                onChange={(e) => onLanguageChange(e.target.value)}
+                onChange={(e) => onLanguageChange(e.target.value as Language)}
                 className="bg-gray-800 border border-gray-700 text-xs font-semibold text-white rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#6C4AB6]"
               >
                 <option value="en">English (US/LK)</option>

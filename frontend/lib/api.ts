@@ -1,8 +1,7 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+import type { UserRole, User, Order, Message, ReviewSubmission } from "@/lib/types";
 
-// ==========================================
-// 1. TypeScript Data Models (Interfaces)
-// ==========================================
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const AUTH_STORAGE_KEY = "stitchlink-auth";
 
 export interface Dressmaker {
   id: number;
@@ -57,13 +56,150 @@ export interface ProductionRiskResponse {
   recommended_action: string;
 }
 
-// ==========================================
-// 2. API Helper Functions
-// ==========================================
+function toApiUrl(path: string): string {
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  const isAbsoluteUrl = /^https?:\/\//i.test(normalizedPath);
 
-/**
- * Checks backend server health status
- */
+  if (isAbsoluteUrl) {
+    return normalizedPath;
+  }
+
+  return `${API_URL}/api/v1${normalizedPath}`;
+}
+
+export function getAuthToken(): string {
+  if (typeof window === "undefined") {
+    return "";
+  }
+
+  return localStorage.getItem("stitchlink-token") ?? "";
+}
+
+export function setAuthToken(token: string, role: UserRole, name: string): void {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  localStorage.setItem("stitchlink-token", token);
+  localStorage.setItem(
+    AUTH_STORAGE_KEY,
+    JSON.stringify({
+      token,
+      role,
+      name,
+    })
+  );
+}
+
+export function getStoredUser(): { name: string; role: UserRole } {
+  if (typeof window === "undefined") {
+    return { name: "", role: "SHOP" };
+  }
+
+  try {
+    const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+    if (!raw) {
+      return { name: "", role: "SHOP" };
+    }
+
+    const parsed = JSON.parse(raw) as { name?: string; role?: UserRole };
+    return { name: parsed.name ?? "", role: parsed.role ?? "SHOP" };
+  } catch {
+    return { name: "", role: "SHOP" };
+  }
+}
+
+export function logout(): void {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  localStorage.removeItem("stitchlink-token");
+  localStorage.removeItem(AUTH_STORAGE_KEY);
+  window.location.href = "/login";
+}
+
+export async function fetchApi<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const headers = new Headers(options.headers ?? {});
+  const token = getAuthToken();
+
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+
+  if (!(options.body instanceof FormData) && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
+  }
+
+  const response = await fetch(toApiUrl(path), {
+    ...options,
+    headers,
+  });
+
+  if (!response.ok) {
+    let message = "Request failed";
+
+    try {
+      const payload = await response.json();
+      if (payload && typeof payload.detail === "string") {
+        message = payload.detail;
+      } else if (payload && typeof payload.message === "string") {
+        message = payload.message;
+      } else if (payload && typeof payload.error === "string") {
+        message = payload.error;
+      }
+    } catch {
+      message = `Request failed (${response.status})`;
+    }
+
+    throw new Error(message);
+  }
+
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
+  const text = await response.text();
+  if (!text) {
+    return undefined as T;
+  }
+
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    return text as unknown as T;
+  }
+}
+
+export async function getOrderDetails(orderId: string): Promise<Order> {
+  return fetchApi<Order>(`/orders/${orderId}`);
+}
+
+export async function updateOrderStatus(orderId: number, status: string): Promise<Order> {
+  return fetchApi<Order>(`/orders/${orderId}/status`, {
+    method: "PATCH",
+    body: JSON.stringify({ status }),
+  });
+}
+
+export async function getOrderMessages(orderId: string): Promise<Message[]> {
+  return fetchApi<Message[]>(`/messages/order/${orderId}`);
+}
+
+export async function sendMessage(orderId: number, content: string): Promise<Message> {
+  return fetchApi<Message>(`/messages/order/${orderId}`, {
+    method: "POST",
+    body: JSON.stringify({ content }),
+  });
+}
+
+export async function submitReview(payload: ReviewSubmission): Promise<void> {
+  await fetchApi(`/reviews`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
 export async function checkBackendHealth() {
   const response = await fetch(`${API_URL}/health`);
   if (!response.ok) {
@@ -72,9 +208,6 @@ export async function checkBackendHealth() {
   return response.json();
 }
 
-/**
- * Fetches dressmakers list from backend with optional filters
- */
 export async function fetchDressmakers(
   district?: string,
   category?: string,
@@ -92,9 +225,6 @@ export async function fetchDressmakers(
   return response.json();
 }
 
-/**
- * Validates selected garment category against title and description using AI
- */
 export async function validateCategory(
   data: CategoryValidationRequest
 ): Promise<CategoryValidationResponse> {
@@ -109,9 +239,6 @@ export async function validateCategory(
   return response.json();
 }
 
-/**
- * Gets AI pricing recommendations based on category, volume, and urgency
- */
 export async function getSuggestedPricing(
   data: PricingAssistantRequest
 ): Promise<PricingAssistantResponse> {
@@ -126,9 +253,6 @@ export async function getSuggestedPricing(
   return response.json();
 }
 
-/**
- * Evaluates production delay risk for an order
- */
 export async function checkProductionRisk(
   orderId: string
 ): Promise<ProductionRiskResponse> {
@@ -143,3 +267,5 @@ export async function checkProductionRisk(
   }
   return response.json();
 }
+
+export type { User, Order, Message, ReviewSubmission, Bid, UserRole } from "@/lib/types";

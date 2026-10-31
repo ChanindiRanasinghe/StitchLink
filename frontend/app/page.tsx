@@ -85,7 +85,7 @@ export default function Home() {
       {/* Footer */}
       <Footer
         currentLang={currentLang}
-        onLanguageChange={setCurrentLang}
+        onLanguageChange={(lang) => setCurrentLang(lang as typeof currentLang)}
         onOpenAdminAuth={() => openAuth("login", "admin")}
       />
 
