@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { Language, translations } from "@/lib/translations";
@@ -20,11 +20,11 @@ export default function Navbar({
   const t = translations[currentLang] || translations.en;
 
   const navLinks = [
-    { name: t.navMarketplace, href: "#marketplace" },
+    { name: t.navMarketplace, href: "/dressmaker/browse" },
+    { name: "Explore Map", href: "/explore" },
     { name: t.navHowItWorks, href: "#how-it-works" },
-    { name: t.navAiFeatures, href: t.navAiFeatures },
+    { name: t.navAiFeatures, href: "#ai-features" },
     { name: t.navBenefits, href: "#benefits" },
-    { name: t.navTestimonials, href: "#testimonials" },
   ];
 
   return (
@@ -69,7 +69,7 @@ export default function Navbar({
             onClick={onOpenGuide}
             className="px-3 py-1.5 rounded-lg bg-teal-50 text-[#2A9D8F] hover:bg-teal-100 text-xs font-bold border border-teal-200 flex items-center gap-1.5 transition-colors"
           >
-            <span>💡</span> Guide / උපකාර
+            <span>ðŸ’¡</span> Guide / à¶‹à¶´à¶šà·à¶»
           </button>
 
           {/* Language Selector Pill */}
@@ -88,7 +88,7 @@ export default function Navbar({
                 currentLang === "si" ? "bg-white text-[#6C4AB6] shadow-xs" : "text-[#6B7280]"
               }`}
             >
-              සිං
+              à·ƒà·’à¶‚
             </button>
             <button
               onClick={() => onLanguageChange("ta")}
@@ -96,7 +96,7 @@ export default function Navbar({
                 currentLang === "ta" ? "bg-white text-[#6C4AB6] shadow-xs" : "text-[#6B7280]"
               }`}
             >
-              த
+              à®¤
             </button>
           </div>
 
@@ -124,7 +124,7 @@ export default function Navbar({
             onClick={onOpenGuide}
             className="p-1.5 bg-teal-50 text-[#2A9D8F] rounded-lg text-xs font-bold border border-teal-200"
           >
-            💡
+            ðŸ’¡
           </button>
           <div className="flex items-center bg-gray-100 p-0.5 rounded-lg border border-gray-200">
             <button
@@ -137,13 +137,13 @@ export default function Navbar({
               onClick={() => onLanguageChange("si")}
               className={`px-1.5 py-0.5 text-[10px] font-bold rounded ${currentLang === "si" ? "bg-white text-[#6C4AB6]" : "text-gray-500"}`}
             >
-              සිං
+              à·ƒà·’à¶‚
             </button>
             <button
               onClick={() => onLanguageChange("ta")}
               className={`px-1.5 py-0.5 text-[10px] font-bold rounded ${currentLang === "ta" ? "bg-white text-[#6C4AB6]" : "text-gray-500"}`}
             >
-              த
+              à®¤
             </button>
           </div>
           <button
@@ -199,3 +199,6 @@ export default function Navbar({
     </header>
   );
 }
+
+
+
