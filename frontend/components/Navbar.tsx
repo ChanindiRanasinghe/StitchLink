@@ -22,6 +22,7 @@ export default function Navbar({
   const navLinks = [
     { name: t.navMarketplace, href: "/dressmaker/browse" },
     { name: "Explore Map", href: "/explore" },
+    { name: "Cost Calculator", href: "/calculator" },
     { name: t.navHowItWorks, href: "#how-it-works" },
     { name: t.navAiFeatures, href: "#ai-features" },
     { name: t.navBenefits, href: "#benefits" },
@@ -199,6 +200,7 @@ export default function Navbar({
     </header>
   );
 }
+
 
 
 
