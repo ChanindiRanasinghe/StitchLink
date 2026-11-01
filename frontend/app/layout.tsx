@@ -1,12 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "StitchLink | B2B Marketplace for Garment Sourcing & Solo Dressmakers",
@@ -28,11 +21,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-[#F9FAFB] text-[#1F2937] font-sans">
+    <html lang="en" className="h-full antialiased scroll-smooth">
+      <body className="min-h-full flex flex-col bg-[#F8FAFC] text-[#1E293B] font-sans selection:bg-teal-500/20 selection:text-teal-900">
         {children}
       </body>
     </html>
   );
 }
-
