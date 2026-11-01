@@ -172,3 +172,17 @@ def production_risk_check(order_id: str):
         "risk_factors": ["Workload bottleneck", "Local weather disruption"],
         "recommended_action": "Extend deadline by 2 days or split batch with a nearby dressmaker in Kandy.",
     }
+# --- Mount Core V1 Routers (Auth, Orders, Bids, Users, Messages) ---
+try:
+    from app.api.v1.api import api_router
+    app.include_router(api_router, prefix="/api/v1")
+except Exception as e:
+    print(f"Core API router registration notice: {e}")
+
+@app.on_event("startup")
+async def startup_event():
+    try:
+        from app.db.init_db import init_db
+        init_db()
+    except Exception as e:
+        print(f"Database initialization deferred: {e}")
